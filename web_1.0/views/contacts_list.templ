@@ -1,0 +1,9 @@
+package views
+
+templ ContactsList(contacts []Contact) {
+  <ul>
+  for _, contact := range contacts {
+    <li>{ contact.Name }</li>
+  }
+  </ul>
+}
