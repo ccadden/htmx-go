@@ -1,6 +1,9 @@
 package views
 
-templ ContactsList(contacts []Contact) {
+import "github.com/ccadden/htmx-go/web_1.0/models"
+
+templ ContactsList(contacts []models.Contact) {
+  <h1>Contacts</h1>
   <ul>
   for _, contact := range contacts {
     <li>{ contact.Name }</li>
