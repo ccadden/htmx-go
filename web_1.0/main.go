@@ -19,6 +19,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	db.Migrator().DropTable(&models.Contact{})
 	db.AutoMigrate(&models.Contact{})
 	db.Create(&models.Contact{Name: "MC"})
 	db.Create(&models.Contact{Name: "CC"})
