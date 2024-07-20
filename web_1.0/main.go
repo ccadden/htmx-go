@@ -20,21 +20,22 @@ func main() {
 	}
 
 	db.AutoMigrate(&models.Contact{})
-	// db.Create(&models.Contact{Name: "MC"})
-	// db.Create(&models.Contact{Name: "CC"})
-	// db.Create(&models.Contact{Name: "CR"})
+	db.Create(&models.Contact{Name: "MC"})
+	db.Create(&models.Contact{Name: "CC"})
+	db.Create(&models.Contact{Name: "CR"})
 
 	helloComponent := views.Hello("World")
 	http.Handle("/", templ.Handler(helloComponent))
 
 	var contacts []models.Contact
-	// db.Find(&contacts)
+	result := db.Find(&contacts)
+
+	if result.Error != nil {
+		log.Fatal("Failed to get contacts")
+	}
 
 	contactsListComponent := views.ContactsList(contacts)
 	http.Handle("/contacts", templ.Handler(contactsListComponent))
-	// http.HandleFunc("/contacts", func(w http.ResponseWriter, r *http.Request) {
-	// 	fmt.Fprintf(w, "Contacts")
-	// })
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
