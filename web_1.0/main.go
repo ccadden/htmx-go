@@ -11,5 +11,9 @@ func main() {
 		fmt.Fprintf(w, "Hello, world")
 	})
 
+	http.HandleFunc("/contacts", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Contacts")
+	})
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
