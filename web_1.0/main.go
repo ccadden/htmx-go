@@ -4,8 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/a-h/templ"
-
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
@@ -40,10 +38,21 @@ func initDB() {
 
 func contactsHandler(w http.ResponseWriter, r *http.Request) {
 	var contacts []models.Contact
-	result := db.Find(&contacts)
 
-	if result.Error != nil {
-		log.Fatal("Failed to get contacts")
+	q := r.URL.Query().Get("q")
+
+	if q == "" {
+		result := db.Find(&contacts)
+		if result.Error != nil {
+			log.Fatal("Failed to get contacts")
+		}
+	} else {
+		q = "%" + q + "%"
+		result := db.Where("Name LIKE ?", q).Find(&contacts)
+		if result.Error != nil {
+			log.Fatal("Failed to get contacts")
+		}
+
 	}
 
 	if err := views.ContactsList(contacts).Render(r.Context(), w); err != nil {
