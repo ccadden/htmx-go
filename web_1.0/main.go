@@ -13,8 +13,20 @@ import (
 	"github.com/ccadden/htmx-go/web_1.0/views"
 )
 
+var db *gorm.DB
+
 func main() {
-	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	initDB()
+
+	http.HandleFunc("/", helloHandler)
+	http.HandleFunc("/contacts", contactsHandler)
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func initDB() {
+	var err error
+	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -24,10 +36,9 @@ func main() {
 	db.Create(&models.Contact{Name: "MC"})
 	db.Create(&models.Contact{Name: "CC"})
 	db.Create(&models.Contact{Name: "CR"})
+}
 
-	helloComponent := views.Hello("World")
-	http.Handle("/", templ.Handler(helloComponent))
-
+func contactsHandler(w http.ResponseWriter, r *http.Request) {
 	var contacts []models.Contact
 	result := db.Find(&contacts)
 
@@ -35,8 +46,15 @@ func main() {
 		log.Fatal("Failed to get contacts")
 	}
 
-	contactsListComponent := views.ContactsList(contacts)
-	http.Handle("/contacts", templ.Handler(contactsListComponent))
+	if err := views.ContactsList(contacts).Render(r.Context(), w); err != nil {
+		log.Fatal("Failed to render contacts page")
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	}
+}
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	if err := views.Hello("World").Render(r.Context(), w); err != nil {
+		log.Fatal("Failed to render hello page")
+
+	}
 }
